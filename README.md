@@ -1,48 +1,52 @@
 # IPFS File Manager
 
-Este repositório contém código JavaScript para interagir com o IPFS (InterPlanetary File System). Ele oferece funcionalidades para adicionar e recuperar arquivos do IPFS.
+This repository contains JavaScript code to interact with IPFS (InterPlanetary File System). It provides functionalities to add and retrieve files from IPFS.
 
-## Adicionar um arquivo ao IPFS
+## Adding a File to IPFS
 
-Para adicionar um arquivo ao IPFS, utilize o seguinte código:
+To add a file to IPFS, use the following code:
 
 ```javascript
 import { create } from 'ipfs';
-import { readFile as _readFile } from 'fs';
+import { writeFile } from 'fs/promises';
 
 class IPFSFileManager {
   // ...
 }
+
+const ipfsFileManager = new IPFSFileManager();
 
 const filePath = './file.txt';
-const ipfsFileManager = new IPFSFileManager(filePath);
-ipfsFileManager.addFileToIPFS();
+ipfsFileManager.addFileToIPFS(filePath);
 ```
 
-Certifique-se de substituir `filePath` pelo caminho do arquivo que você deseja adicionar ao IPFS.
+Make sure to replace `filePath` with the path of the file you want to add to IPFS.
 
-## Recuperar um arquivo do IPFS
+## Retrieving a File from IPFS
 
-Para recuperar um arquivo do IPFS, utilize o seguinte código:
+To retrieve a file from IPFS, use the following code:
 
 ```javascript
 import { create } from 'ipfs';
-import { writeFileSync } from 'fs';
+import { writeFile } from 'fs/promises';
+import { fileTypeFromBuffer } from 'file-type';
 
 class IPFSFileManager {
   // ...
 }
 
-const cid = 'QmQgGxzWnzjCfouxRiozBiEG3wcsuJGWjtHjv3wurVbJ9s'; // Substitua pelo CID do arquivo que você deseja recuperar
-const ipfsFileManager = new IPFSFileManager(cid);
-ipfsFileManager.retrieveFileFromIPFS();
+const ipfsFileManager = new IPFSFileManager();
+
+const cid = 'QmQgGxzWnzjCfouxRiozBiEG3wcsuJGWjtHjv3wurVbJ9s'; // Replace with the CID of the file you want to retrieve
+const filepath = './retrievedFile'; // Specify the file path without the extension
+ipfsFileManager.retrieveFileFromIPFS(cid, filepath);
 ```
 
-Certifique-se de substituir `cid` pelo CID do arquivo que você deseja recuperar do IPFS.
+Make sure to replace `cid` with the CID of the file you want to retrieve from IPFS.
 
-## Observações
+## Notes
 
-- Certifique-se de ter o Node.js instalado em seu ambiente de desenvolvimento.
-- Instale as dependências necessárias antes de executar o código. Você pode usar o npm ou o yarn para instalar as dependências especificadas no arquivo `package.json`.
+- Make sure you have Node.js installed in your development environment.
+- Install the necessary dependencies before running the code. You can use npm or yarn to install the dependencies specified in the `package.json` file.
 
-Sinta-se à vontade para explorar e modificar o código de acordo com suas necessidades.
+Feel free to explore and modify the code according to your needs.
