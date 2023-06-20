@@ -1,15 +1,11 @@
-import { create } from 'ipfs';
 import { writeFile } from 'fs/promises';
 import { fileTypeFromBuffer } from 'file-type';
+import IPFSManager from './IPFSManager.js';
 
-class IPFSFileManager {
+export default class IPFSFileRetriever extends IPFSManager {
   constructor() {
+    super();
     this.node = null;
-  }
-
-  async initIPFS() {
-    this.node = await create();
-    console.log('IPFS node is ready');
   }
 
   async retrieveFileFromIPFS(cid, filepath) {
@@ -23,7 +19,7 @@ class IPFSFileManager {
       const fileData = Buffer.concat(chunks);
 
       // Determine the file extension based on the MIME type
-      const { mime } = await this.getfileTypeFromFile(fileData);
+      const mime = await this.getFileTypeFromFile(fileData);
       const fileExtension = this.getFileExtension(mime);
 
       // Save the file data to a local file with the appropriate extension
@@ -47,7 +43,7 @@ class IPFSFileManager {
     }
   }
 
-  async getfileTypeFromFile(fileData) {
+  async getFileTypeFromFile(fileData) {
     try {
       return fileTypeFromBuffer(fileData);
     } catch (error) {
@@ -69,16 +65,4 @@ class IPFSFileManager {
     // Return the corresponding extension if available, otherwise fallback to 'dat'
     return extensionMap[mimeType] || 'dat';
   }
-
-  async closeIPFS() {
-    if (this.node) {
-      await this.node.stop();
-      console.log('IPFS node connection closed');
-    }
-  }
 }
-
-const cid = 'QmZ6h18zefo1DEEN5QC3WberbAFAkhvKmhEF6eJou6TC3h'; // Replace with the CID of the file you want to retrieve
-const filepath = './retrievedFile'; // Specify the file path without the extension
-const ipfsFileManager = new IPFSFileManager();
-ipfsFileManager.retrieveFileFromIPFS(cid, filepath);
