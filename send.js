@@ -1,5 +1,5 @@
 import { create } from 'ipfs';
-import { readFile as _readFile } from 'fs';
+import { readFile } from 'fs/promises';
 
 class IPFSFileManager {
   constructor(filePath) {
@@ -12,16 +12,13 @@ class IPFSFileManager {
     console.log('IPFS node is ready');
   }
 
-  readFile() {
-    return new Promise((resolve, reject) => {
-      _readFile(this.filePath, (error, data) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(data);
-        }
-      });
-    });
+  async readFile() {
+    try {
+      const data = await readFile(this.filePath);
+      return data;
+    } catch (error) {
+      throw new Error(`Failed to read the file: ${error}`);
+    }
   }
 
   async addFileToIPFS() {
@@ -48,4 +45,3 @@ class IPFSFileManager {
 const filePath = './file.txt';
 const ipfsFileManager = new IPFSFileManager(filePath);
 ipfsFileManager.addFileToIPFS();
-//ipfsFileManager.closeIPFS();

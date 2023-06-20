@@ -1,9 +1,8 @@
 import { create } from 'ipfs';
-import { writeFileSync } from 'fs';
+import { writeFile } from 'fs/promises';
 
 class IPFSFileManager {
-  constructor(cid) {
-    this.cid = cid;
+  constructor() {
     this.node = null;
   }
 
@@ -12,9 +11,10 @@ class IPFSFileManager {
     console.log('IPFS node is ready');
   }
 
-  async retrieveFileFromIPFS() {
+  async retrieveFileFromIPFS(cid, filepath) {
     try {
       await this.initIPFS();
+
       const chunks = [];
       for await (const chunk of this.node.cat(this.cid)) {
         chunks.push(chunk);
@@ -23,12 +23,21 @@ class IPFSFileManager {
 
       // Save the file data to a local file
       const filePath = `./retrievedFile.pdf`;
-      writeFileSync(filePath, fileData);
-      
+      await this.saveFileToLocal(filePath, fileData);
+
       this.closeIPFS();
       console.log('File retrieved from IPFS and saved as:', filePath);
     } catch (error) {
       console.error('Failed to retrieve the file from IPFS', error);
+    }
+  }
+
+  async saveFileToLocal(filePath, fileData) {
+    try {
+      await writeFile(filePath, fileData);
+    } catch (error) {
+      console.error('Failed to save the file locally', error);
+      throw error;
     }
   }
 
