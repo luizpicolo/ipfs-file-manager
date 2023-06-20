@@ -30,10 +30,11 @@ class IPFSFileManager {
       const filePath = `${filepath}.${fileExtension}`;
       await this.saveFileToLocal(filePath, fileData);
 
-      this.closeIPFS();
       console.log('File retrieved from IPFS and saved as:', filePath);
     } catch (error) {
       console.error('Failed to retrieve the file from IPFS', error);
+    } finally {
+      this.closeIPFS();
     }
   }
 
@@ -61,6 +62,7 @@ class IPFSFileManager {
       'application/pdf': 'pdf',
       'image/jpeg': 'jpg',
       'image/png': 'png',
+      'text/plain': 'txt',
       // Add more MIME types and extensions as needed
     };
 
@@ -76,7 +78,7 @@ class IPFSFileManager {
   }
 }
 
-const cid = 'QmQgGxzWnzjCfouxRiozBiEG3wcsuJGWjtHjv3wurVbJ9s'; // Replace with the CID of the file you want to retrieve
+const cid = 'QmZ6h18zefo1DEEN5QC3WberbAFAkhvKmhEF6eJou6TC3h'; // Replace with the CID of the file you want to retrieve
 const filepath = './retrievedFile'; // Specify the file path without the extension
 const ipfsFileManager = new IPFSFileManager();
 ipfsFileManager.retrieveFileFromIPFS(cid, filepath);
