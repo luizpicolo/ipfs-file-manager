@@ -2,8 +2,7 @@ import { create } from 'ipfs';
 import { readFile } from 'fs/promises';
 
 class IPFSFileManager {
-  constructor(filePath) {
-    this.filePath = filePath;
+  constructor() {
     this.node = null;
   }
 
@@ -12,25 +11,25 @@ class IPFSFileManager {
     console.log('IPFS node is ready');
   }
 
-  async readFile() {
-    try {
-      const data = await readFile(this.filePath);
-      return data;
-    } catch (error) {
-      throw new Error(`Failed to read the file: ${error}`);
-    }
-  }
-
-  async addFileToIPFS() {
+  async addFileToIPFS(filePath) {
     try {
       await this.initIPFS();
-      const fileData = await this.readFile();
+      const fileData = await this.readFile(filePath);
       const results = await this.node.add({ content: fileData });
       const cid = results.cid.toString();
-      this.closeIPFS();
       console.log('File added to IPFS with CID:', cid);
     } catch (error) {
       console.error('Failed to add the file to IPFS', error);
+    } finally {
+      this.closeIPFS();
+    }
+  }
+
+  async readFile(filePath) {
+    try {
+      return await readFile(filePath);
+    } catch (error) {
+      throw new Error(`Failed to read the file: ${error}`);
     }
   }
 
@@ -42,6 +41,6 @@ class IPFSFileManager {
   }
 }
 
-const filePath = './file.txt';
-const ipfsFileManager = new IPFSFileManager(filePath);
-ipfsFileManager.addFileToIPFS();
+const filePath = './image.jpg';
+const ipfsFileManager = new IPFSFileManager();
+ipfsFileManager.addFileToIPFS(filePath);
