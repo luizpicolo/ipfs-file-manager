@@ -1,5 +1,6 @@
 import { create } from 'ipfs';
 import { writeFile } from 'fs/promises';
+import { fileTypeFromBuffer } from 'file-type';
 
 class IPFSFileManager {
   constructor() {
@@ -16,13 +17,17 @@ class IPFSFileManager {
       await this.initIPFS();
 
       const chunks = [];
-      for await (const chunk of this.node.cat(this.cid)) {
+      for await (const chunk of this.node.cat(cid)) {
         chunks.push(chunk);
       }
       const fileData = Buffer.concat(chunks);
 
-      // Save the file data to a local file
-      const filePath = `./retrievedFile.pdf`;
+      // Determine the file extension based on the MIME type
+      const { mime } = await this.getfileTypeFromFile(fileData);
+      const fileExtension = this.getFileExtension(mime);
+
+      // Save the file data to a local file with the appropriate extension
+      const filePath = `${filepath}.${fileExtension}`;
       await this.saveFileToLocal(filePath, fileData);
 
       this.closeIPFS();
@@ -41,6 +46,28 @@ class IPFSFileManager {
     }
   }
 
+  async getfileTypeFromFile(fileData) {
+    try {
+      return fileTypeFromBuffer(fileData);
+    } catch (error) {
+      console.error('Failed to determine the file type', error);
+      throw error;
+    }
+  }
+
+  getFileExtension(mimeType) {
+    // Map commonly used MIME types to file extensions
+    const extensionMap = {
+      'application/pdf': 'pdf',
+      'image/jpeg': 'jpg',
+      'image/png': 'png',
+      // Add more MIME types and extensions as needed
+    };
+
+    // Return the corresponding extension if available, otherwise fallback to 'dat'
+    return extensionMap[mimeType] || 'dat';
+  }
+
   async closeIPFS() {
     if (this.node) {
       await this.node.stop();
@@ -50,5 +77,6 @@ class IPFSFileManager {
 }
 
 const cid = 'QmQgGxzWnzjCfouxRiozBiEG3wcsuJGWjtHjv3wurVbJ9s'; // Replace with the CID of the file you want to retrieve
-const ipfsFileManager = new IPFSFileManager(cid);
-ipfsFileManager.retrieveFileFromIPFS();
+const filepath = './retrievedFile'; // Specify the file path without the extension
+const ipfsFileManager = new IPFSFileManager();
+ipfsFileManager.retrieveFileFromIPFS(cid, filepath);
